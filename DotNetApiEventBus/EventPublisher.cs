@@ -3,8 +3,8 @@ using MassTransit;
 using MassTransit.Transactions;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using DotNetApiUnitOfWork;
+using System.Security.AccessControl;
 
 namespace DotNetApiEventBus
 {
@@ -84,16 +84,18 @@ namespace DotNetApiEventBus
         /// <exception cref="ArgumentNullException">Thrown if the events are null</exception>
         public async Task Publish(IEnumerable<object> events)
         {
-            using (_logger.LogCaller())
-            {
+            _logger.LogInformationCaller("Start publishing events");
                 if (events == null)
-                {
-                    throw new ArgumentNullException("The event cannot be null");
-                }
-                _logger.LogInformation("Publishing {EventCounts} events", events.Count());
-                await _bus.PublishBatch(events);
-                _logger.LogInformation("Published events");
+            {
+                throw new ArgumentNullException("The event cannot be null");
             }
+            foreach (var @event in events)
+            {
+                _logger.LogInformationCaller("Publishing event {@event}", args: [@event]);
+            }
+
+            await _bus.PublishBatch(events);
+            _logger.LogInformationCaller("Start publishing events");
         }
     }
 }

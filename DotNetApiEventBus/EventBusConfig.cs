@@ -56,6 +56,21 @@ namespace DotNetApiEventBus
             QueueName = section[ConfigurationSectionQueueNameName] ?? DefaultQueueName;
         }
         /// <summary>
+        /// Creates a new event bus configuratino
+        /// </summary>
+        /// <param name="host">The host</param>
+        /// <param name="username">The username</param>
+        /// <param name="password">The password</param>
+        /// <param name="queueName">The queue name</param>
+        public EventBusConfig(string host, string username, string password, string queueName)
+        {
+            Host = host;
+            Username = username;
+            Password = password;
+            QueueName = queueName;
+        }
+
+        /// <summary>
         /// The event bus host
         /// </summary>
         public string Host { get; private set; } = DefaultHost;

@@ -46,16 +46,13 @@ namespace DotNetApiEventBus
         /// <returns></returns>
         public async Task Consume(ConsumeContext<EventType> context)
         {
-            using (_logger.LogCaller())
-            {
-                _logger.LogInformation("Processing from queue {QueueName} message {@Message}",
-                    ConsumerDefintion.EventBusConfig.QueueName,
-                    context.Message);
-                await Consume(context.Message);
-                _logger.LogInformation("Processed from queue {QueueName} message {@Message}",
-                    ConsumerDefintion.EventBusConfig.QueueName,
-                    context.Message);
-            }
+            _logger.LogInformationCaller("Processing from queue {QueueName} message {@Message}",
+                args: [ConsumerDefintion.EventBusConfig.QueueName,
+                context.Message]);
+            await Consume(context.Message);
+            _logger.LogInformationCaller("Processed from queue {QueueName} message {@Message}",
+                args: [ConsumerDefintion.EventBusConfig.QueueName,
+                context.Message]);
         }
         /// <summary>
         /// The entry point for consuming events, implement this and
