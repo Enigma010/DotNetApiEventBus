@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11217.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetApiEventBus", "DotNetApiEventBus.csproj", "{9B5258C2-F173-E2F1-DEF6-A3E5840ADC43}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B5258C2-F173-E2F1-DEF6-A3E5840ADC43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B5258C2-F173-E2F1-DEF6-A3E5840ADC43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B5258C2-F173-E2F1-DEF6-A3E5840ADC43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B5258C2-F173-E2F1-DEF6-A3E5840ADC43}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8E33B053-D199-4064-86D9-BC4A69B9D037}
+	EndGlobalSection
+EndGlobal

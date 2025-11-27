@@ -1,12 +1,8 @@
 ﻿using MassTransit;
-using MassTransit.Configuration;
-using MassTransit.Metadata;
-using MassTransit.Util;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using static MassTransit.MessageHeaders;
 
 namespace DotNetApiEventBus.Di
 {
