@@ -9,10 +9,7 @@ namespace DotNetApiEventBus.Tests.EndToEnd.Api.Di
     {
         public static void AddDependencies(this IHostApplicationBuilder builder)
         {
-            builder.AddEventBusDependencies(
-                "TestsApiEndToEnd",
-                ["DotNetApiEventBus.Tests.EndToEnd.Api"],
-                ["DotNetApiEventBus.Tests.EndToEnd.Api"]);
+            builder.AddEventBusDependencies(["DotNetApiEventBus.Tests.EndToEnd.Api"]);
             builder.Services.AddScoped<IEventOneService, EventOneService>();
             builder.Services.AddScoped<IEventOneConsumerService, EventOneConsumerService>();
             var logConfig = new LogConfig();

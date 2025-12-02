@@ -1,6 +1,11 @@
-﻿using MassTransit;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Rebus.Bus;
+using Rebus.Config;
+using Rebus.Persistence.FileSystem;
+using Rebus.RabbitMq;
+using Rebus.Routing.TypeBased;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -23,76 +28,55 @@ namespace DotNetApiEventBus.Di
         /// <param name="builder">The application host builder</param>
         public static void AddEventBusDependencies(
             this IHostApplicationBuilder builder, 
-            string queueNamePrefix,
-            IEnumerable<string> publisherAssemblyNames,
-            IEnumerable<string> consumerAssemblyNames)
+            IEnumerable<string> subscriberAssemblyNames)
         {
             EventBusConfig eventBusConfig = new EventBusConfig(builder.Configuration);
-            List<Assembly> consumerAssemblies = new List<Assembly>();
+            List<Assembly> subscriberAssemblies = new List<Assembly>();
             List<Assembly> publisherAssemblies = new List<Assembly>();
-            if (string.IsNullOrEmpty(queueNamePrefix))
+            subscriberAssemblyNames.ToList().ForEach(subscriberAssemblyName =>
             {
-                throw new ArgumentNullException("The queue name prefix cannot be null or empty");
+                subscriberAssemblies.Add(Assembly.Load(subscriberAssemblyName));
+            });
+
+            builder.Services.AddRebus(
+                (configure, provider) => {
+                    return configure.Transport(t =>
+                    t.UseRabbitMq(eventBusConfig.ConnectionString, eventBusConfig.QueueName));
+                },
+                onCreated: async (bus) =>
+                {
+                    foreach (Assembly subscriberAssembly in subscriberAssemblies)
+                    {
+                        foreach ((Type subscriberType, Type subscriberEventType) in subscriberAssembly.GetSubscriberAndEventTypes())
+                        {
+                            await bus.Subscribe(subscriberEventType);
+                        }
+                    }
+                });
+            foreach (Assembly subscriberAssembly in subscriberAssemblies)
+            {
+                foreach ((Type subscriberType, Type subscriberEventType) in subscriberAssembly.GetSubscriberAndEventTypes())
+                {
+                    builder.Services.AddRebusHandler(subscriberType);
+                }
             }
-            consumerAssemblyNames.ToList().ForEach(consumerAssemblyName =>
-            {
-                consumerAssemblies.Add(Assembly.Load(consumerAssemblyName));
-            });
-            publisherAssemblyNames.ToList().ForEach(publisherAssemblyName =>
-            {
-                publisherAssemblies.Add(Assembly.Load(publisherAssemblyName));
-            });
-            builder.Services.AddMassTransit(mt =>
-            {
-                mt.SetKebabCaseEndpointNameFormatter();
-                consumerAssemblies.ForEach(entryAssembly =>
+            
+            /*
+            builder.Services.AddRebus(
+                configure => configure
+                .Transport(t => t.UseRabbitMq(eventBusConfig.ConnectionString, eventBusConfig.QueueName))
+                .Routing(r =>
                 {
-                    mt.AddConsumers(entryAssembly);
-                    mt.AddActivities(entryAssembly);
-                });
-                mt.UsingRabbitMq((context, cfg) =>
-                {
-                    cfg.Host(eventBusConfig.Host, "/", h =>
+                    foreach (Assembly subscriberAssembly in subscriberAssemblies)
                     {
-                        h.Username(eventBusConfig.Username);
-                        h.Password(eventBusConfig.Password);
-                    });
-                    foreach(Assembly publisherAssembly in publisherAssemblies)
-                    {
-                        foreach (Type eventType in publisherAssembly.GetAppEventTypes())
+                        foreach (Type subscriberEventType in subscriberAssembly.GetSubscriberEventTypes())
                         {
-                            MethodInfo configureTopology = typeof(DependencyInjector).GetMethod(nameof(DependencyInjector.ConfigureTopology), BindingFlags.NonPublic | BindingFlags.Static) 
-                            ?? throw new InvalidOperationException();
-                            configureTopology = configureTopology.MakeGenericMethod([eventType]);
-                            configureTopology.Invoke(null, [cfg]);
+                            r.TypeBased().MapAssemblyOf(subscriberEventType, "EventBus.TestsEndToEnd");
                         }
                     }
-                    foreach(Assembly consumerAssembly in consumerAssemblies)
-                    {
-                        foreach(Type eventConsumerType in consumerAssembly.GetEventConsumerTypes())
-                        {
-                            MethodInfo configureReceiveEndPoint = typeof(DependencyInjector).GetMethod(nameof(DependencyInjector.ConfigureReceiveEndPoint), BindingFlags.NonPublic | BindingFlags.Static)
-                            ?? throw new InvalidOperationException();
-                            configureReceiveEndPoint = configureReceiveEndPoint.MakeGenericMethod([eventConsumerType]);
-                            configureReceiveEndPoint.Invoke(null, [cfg, context, $"{queueNamePrefix}:{eventConsumerType.Name}"]);
-                        }
-                    }
-                });
-            });
+                }));
+            */
             builder.Services.AddScoped<IEventPublisher, EventPublisher>();
-        }
-        private static void ConfigureTopology<MessageType>(IRabbitMqBusFactoryConfigurator config) where MessageType : class
-        {
-            config.Message<MessageType>(ct => { });
-            config.AutoDelete = true;
-        }
-        private static void ConfigureReceiveEndPoint<ConsumerType>(IRabbitMqBusFactoryConfigurator config, IBusRegistrationContext context, string queueName) where ConsumerType : class, IConsumer
-        {
-            config.ReceiveEndpoint(queueName, exchangeConfigurator =>
-            {
-                exchangeConfigurator.AutoDelete = true;
-                exchangeConfigurator.Consumer<ConsumerType>(context);
-            });
         }
     }
 }

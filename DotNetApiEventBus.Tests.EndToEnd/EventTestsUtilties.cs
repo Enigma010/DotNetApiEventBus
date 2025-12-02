@@ -31,7 +31,7 @@ namespace DotNetApiEventBus.Tests.EndToEnd
                 catch (Api.Client.ApiException<Api.Client.ProblemDetails>)
                 {
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Assert.Fail();
                 }

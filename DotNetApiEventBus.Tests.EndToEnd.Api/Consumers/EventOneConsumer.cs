@@ -5,12 +5,12 @@ using DotNetApiLogging;
 
 namespace DotNetApiEventBus.Tests.EndToEnd.Api.Consumers
 {
-    public class EventOneConsumer : EventConsumer<EventOne>
+    public class EventOneConsumer : EventSubscriber<EventOne>
     {
         private readonly IEventOneService _service;
         private readonly IEventOneConsumerService _serviceConsumer;
 
-        public EventOneConsumer(ILogger<EventConsumer<EventOne>> logger,
+        public EventOneConsumer(ILogger<EventSubscriber<EventOne>> logger,
             IConfiguration configuration,
             IEventOneService service,
             IEventOneConsumerService serviceConsumer): base(logger, configuration)
@@ -19,7 +19,7 @@ namespace DotNetApiEventBus.Tests.EndToEnd.Api.Consumers
             _serviceConsumer = serviceConsumer;
         }
 
-        public override Task Consume(EventOne @event)
+        public override Task Respond(EventOne @event)
         {
             _serviceConsumer.Handle(@event);
             _logger.LogInformationCaller("Creating eventOne {@event}", args: [@event]);

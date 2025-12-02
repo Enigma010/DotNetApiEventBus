@@ -1,1 +1,1 @@
-docker run -p 15672:15672 -p 5672:5672 masstransit/rabbitmq
+docker run -d --name DotNetEventBus -p 5672:5672 -p 8080:15672 rabbitmq:3-management

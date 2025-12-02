@@ -21,7 +21,7 @@ namespace DotNetApiEventBus.Tests.EndToEnd
             {
                 DockerUtilities.StopInstance(EventBusDockerContainerName);
                 DockerUtilities.RemoveInstance(EventBusDockerContainerName);
-                StartProcess("docker", $"run -p 15672:15672 -p 5672:5672 --name {EventBusDockerContainerName} masstransit/rabbitmq", _dockerProcesses);
+                StartProcess("docker", $"run --name {EventBusDockerContainerName} -p 5672:5672 -p 8080:15672 rabbitmq:3-management", _dockerProcesses);
                 System.Threading.Thread.Sleep(WaitForStartMs);
             }
             if (StartApis)
