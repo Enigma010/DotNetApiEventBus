@@ -33,7 +33,7 @@ namespace DotNetApiEventBus.Tests.EndToEnd
             await events.CheckEvents(_check, _check, _host);
         }
 
-        [Fact(Skip = "Retries not working")]
+        [Fact]
         public async Task PublishSingleEventWithTempFailure()
         {
             Events.EventOne eventOne = new Events.EventOne();

@@ -11,7 +11,7 @@ namespace DotNetApiEventBus.Tests.EndToEnd.Api.Di
         {
             builder.AddEventBusDependencies(["DotNetApiEventBus.Tests.EndToEnd.Api"]);
             builder.Services.AddScoped<IEventOneService, EventOneService>();
-            builder.Services.AddScoped<IEventOneConsumerService, EventOneConsumerService>();
+            builder.Services.AddScoped<IEventOneSubscriberService, EventOneSubscriberService>();
             var logConfig = new LogConfig();
             builder.Configuration.GetSection(nameof(LogConfig)).Bind(logConfig);
             builder.AddLoggerDependencies(logConfig);

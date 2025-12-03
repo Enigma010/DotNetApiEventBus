@@ -1,7 +1,5 @@
 ﻿using DotNetApiEventBus.Tests.EndToEnd.Events;
 using DotNetApiLogging;
-using System.IO;
-using System.Text.Json;
 
 namespace DotNetApiEventBus.Tests.EndToEnd.Api.Services
 {

@@ -5,6 +5,7 @@ using Rebus.Bus;
 using Rebus.Config;
 using Rebus.Persistence.FileSystem;
 using Rebus.RabbitMq;
+using Rebus.Retry.Simple;
 using Rebus.Routing.TypeBased;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -40,8 +41,11 @@ namespace DotNetApiEventBus.Di
 
             builder.Services.AddRebus(
                 (configure, provider) => {
-                    return configure.Transport(t =>
-                    t.UseRabbitMq(eventBusConfig.ConnectionString, eventBusConfig.QueueName));
+                    return configure
+                    .Transport(t =>t.UseRabbitMq(eventBusConfig.ConnectionString, 
+                    eventBusConfig.QueueName))
+                    .Options(o => o.HandleMessagesInsideTransactionScope())
+                    .Options(b => b.RetryStrategy(maxDeliveryAttempts: 10));
                 },
                 onCreated: async (bus) =>
                 {
@@ -60,22 +64,6 @@ namespace DotNetApiEventBus.Di
                     builder.Services.AddRebusHandler(subscriberType);
                 }
             }
-            
-            /*
-            builder.Services.AddRebus(
-                configure => configure
-                .Transport(t => t.UseRabbitMq(eventBusConfig.ConnectionString, eventBusConfig.QueueName))
-                .Routing(r =>
-                {
-                    foreach (Assembly subscriberAssembly in subscriberAssemblies)
-                    {
-                        foreach (Type subscriberEventType in subscriberAssembly.GetSubscriberEventTypes())
-                        {
-                            r.TypeBased().MapAssemblyOf(subscriberEventType, "EventBus.TestsEndToEnd");
-                        }
-                    }
-                }));
-            */
             builder.Services.AddScoped<IEventPublisher, EventPublisher>();
         }
     }

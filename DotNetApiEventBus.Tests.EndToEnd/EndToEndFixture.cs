@@ -10,7 +10,17 @@ namespace DotNetApiEventBus.Tests.EndToEnd
         private List<Process> _apiProcesses = new List<Process>();
         private List<Process> _dockerProcesses = new List<Process>();
 
+        /// <summary>
+        /// Setting that dictates whether the testing framework will start the APIs
+        /// set this to false if you want to manually start the APIs for debugging
+        /// purposes
+        /// </summary>
         public static bool StartApis = true;
+        /// <summary>
+        /// Settings that dictates whether to start the related docker infrastructure
+        /// i.e. the event bus, set this to false if you want to manually start the
+        /// event bus via the lrun.sh command
+        /// </summary>
         public static bool StartDocker = true;
 
         public static int WaitForStartMs = 10000;
