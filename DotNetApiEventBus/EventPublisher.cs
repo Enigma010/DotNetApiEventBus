@@ -2,6 +2,7 @@
 using DotNetApiUnitOfWork;
 using Microsoft.Extensions.Logging;
 using Rebus.Bus;
+using Rebus.Messages;
 using Rebus.TransactionScopes;
 using System.Diagnostics.CodeAnalysis;
 using System.Transactions;
@@ -84,7 +85,12 @@ namespace DotNetApiEventBus
             foreach (var @event in events)
             {
                 _logger.LogInformationCaller("Publishing event {@event}", args: [@event]);
-                await _bus.Publish(@event);
+                Dictionary<string, string> headers = new Dictionary<string, string>();
+                if (@event is IEventIdentifier eventIdentifier)
+                {
+                    headers.Add(Headers.CorrelationId, eventIdentifier.EventId);
+                }
+                await _bus.Publish(@event, headers);
             }
             _logger.LogInformationCaller("Finished publishing events");
         }

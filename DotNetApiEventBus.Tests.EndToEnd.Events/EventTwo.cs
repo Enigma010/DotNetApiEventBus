@@ -2,8 +2,12 @@
 
 namespace DotNetApiEventBus.Tests.EndToEnd.Events
 {
-    public class EventTwo : IEvent
+    public class EventTwo : DoaminEventIdentifer, IEvent
     {
+        public EventTwo() : base("DotNetApiEventBus", "Two", Guid.NewGuid().ToString())
+        {
+            Id = Guid.Parse(AggregateId);
+        }
         public Guid Id { get; set; } = Guid.NewGuid();
         public bool ThrowDuringProcessing { get; set; } = false;
         public int AttemptNumber { get; set; } = 0;

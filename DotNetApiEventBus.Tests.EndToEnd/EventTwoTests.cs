@@ -28,14 +28,14 @@ namespace DotNetApiEventBus.Tests.EndToEnd
         public async Task PublishSingleEvent()
         {
             var events = new List<IEvent> { new Events.EventTwo() };
-            await events.CheckEvents(_check, _check, _host);
+            await events.CheckEvents(_check, _host);
         }
 
         [Fact]
         public async Task PublishMultipleEvents()
         {
             var events = new List<IEvent> { new Events.EventTwo(), new Events.EventTwo() };
-            await events.CheckEvents(_check, _check, _host);
+            await events.CheckEvents(_check, _host);
         }
     }
 }

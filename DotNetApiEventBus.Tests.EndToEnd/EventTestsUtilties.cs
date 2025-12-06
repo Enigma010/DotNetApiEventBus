@@ -6,34 +6,47 @@ namespace DotNetApiEventBus.Tests.EndToEnd
     public static class EventTestsUtilties
     {
         public static async Task CheckEvents(this IEnumerable<IEvent> expectedEvents, 
-            Func<IEvent, Task> checkNotFound,
             Func<IEvent, Task> checkFound,
             Microsoft.Extensions.Hosting.IHost host
             )
         {
-            await expectedEvents.CheckEventsNotFound(checkNotFound);
+            await expectedEvents.CheckEventsNotFound(checkFound);
             await expectedEvents.PublishEvents(host);
             await expectedEvents.CheckEventsFound(checkFound);
         }
 
-        public static async Task CheckEventsNotFound(this IEnumerable<IEvent> expectedEvents, Func<IEvent, Task> checkNotFound)
+        public static async Task CheckFailedEvents(this IEnumerable<IEvent> expectedEvents,
+            Func<IEvent, Task> checkFound,
+            Microsoft.Extensions.Hosting.IHost host
+    )
+        {
+            await expectedEvents.CheckEventsNotFound(checkFound);
+            await expectedEvents.PublishEvents(host);
+            await expectedEvents.CheckEventsNotFound(checkFound, TestsConfig.MaxNumberAttempts);
+        }
+
+        public static async Task CheckEventsNotFound(this IEnumerable<IEvent> expectedEvents, Func<IEvent, Task> checkNotFound, int maxNumberAttempts = 1)
         {
             foreach (var expectedEvent in expectedEvents)
             {
-                try
+                for (int attemptNumber = 0; attemptNumber < maxNumberAttempts; attemptNumber++)
                 {
-                    await checkNotFound(expectedEvent);
-                    Assert.Fail();
-                }
-                catch (Api2.Client.ApiException<Api2.Client.ProblemDetails>)
-                {
-                }
-                catch (Api.Client.ApiException<Api.Client.ProblemDetails>)
-                {
-                }
-                catch (Exception)
-                {
-                    Assert.Fail();
+                    try
+                    {
+                        await checkNotFound(expectedEvent);
+                        Assert.Fail();
+                    }
+                    catch (Api2.Client.ApiException<Api2.Client.ProblemDetails>)
+                    {
+                    }
+                    catch (Api.Client.ApiException<Api.Client.ProblemDetails>)
+                    {
+                    }
+                    catch (Exception)
+                    {
+                        Assert.Fail();
+                    }
+                    Thread.Sleep(TestsConfig.AttemptDelayMs);
                 }
             }
         }

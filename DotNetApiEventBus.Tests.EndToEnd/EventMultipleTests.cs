@@ -45,7 +45,7 @@ namespace DotNetApiEventBus.Tests.EndToEnd
                 new Events.EventOne(),
                 new Events.EventTwo()
             };
-            await events.CheckEvents(_check, _check, _host);
+            await events.CheckEvents(_check, _host);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DotNetApiEventBus.Tests.EndToEnd.Events;
+﻿using DotNetApiEventBus.Tests.EndToEnd.Api.Repositories;
+using DotNetApiEventBus.Tests.EndToEnd.Events;
 using DotNetApiLogging;
 
 namespace DotNetApiEventBus.Tests.EndToEnd.Api2.Services
@@ -10,17 +11,17 @@ namespace DotNetApiEventBus.Tests.EndToEnd.Api2.Services
     }
     public class EventTwoSubscriberService : IEventTwoSubscriberService
     {
-        public const string OutputDirectory = "Output";
         private static object _lockObject = new object();
-        private readonly ILogger<IEventTwoSubscriberService> _logger;
+        private readonly ILogger<IEventTwoService> _logger;
         private readonly IEventTwoService _eventTwoService;
+        private readonly EventTwoRepository _fileRepository;
         public EventTwoSubscriberService(IEventTwoService eventTwoService,
-            ILogger<IEventTwoSubscriberService> logger) : base()
+            ILogger<IEventTwoService> logger) : base()
         {
             _eventTwoService = eventTwoService;
             _logger = logger;
+            _fileRepository = new EventTwoRepository(_logger, nameof(EventTwoRepository));
         }
-
 
         public void Respond(EventTwo @event)
         {
@@ -28,19 +29,20 @@ namespace DotNetApiEventBus.Tests.EndToEnd.Api2.Services
             {
                 using (_logger.BeginScope("Handling eventOne {@event}", args: [@event]))
                 {
-                    EventTwo existingEvent = _eventTwoService.Get(@event.Id) ?? @event;
+                    EventTwo existingEvent = _fileRepository.Get(@event.Id) ?? @event;
                     existingEvent.AttemptNumber += 1;
                     _logger.LogInformationCaller("Attempt number {attemptNumber}", args: [existingEvent.AttemptNumber]);
                     _logger.LogInformationCaller("Deleting event");
-                    _eventTwoService.Delete(existingEvent.Id);
+                    _fileRepository.Delete(existingEvent.Id);
                     _logger.LogInformationCaller("Creating event");
-                    _eventTwoService.Create(existingEvent);
+                    _fileRepository.Create(existingEvent);
                     if (existingEvent.ThrowDuringProcessing &&
                         existingEvent.AttemptNumber != existingEvent.SucceedOnAttemptNumber)
                     {
                         _logger.LogInformationCaller("Throwing exception");
                         throw new InvalidOperationException();
                     }
+                    _eventTwoService.Create(@event);
                 }
             }
         }
