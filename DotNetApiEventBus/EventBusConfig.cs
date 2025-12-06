@@ -19,13 +19,25 @@ namespace DotNetApiEventBus
         /// </summary>
         public const string DefaultPassword = "guest";
         /// <summary>
-        /// The default password
+        /// The port
         /// </summary>
-        public const string DefaultQueueName = "eventbusqueue";
+        public const int DefaultPort = 5672;
         /// <summary>
         /// The section name in the configuration
         /// </summary>
-        public const string ConfigurationSectionName = "EventBus";
+        public const string EventBusSectionName = "EventBus";
+        /// <summary>
+        /// The application section name
+        /// </summary>
+        public const string AppSectionName = "App";
+        /// <summary>
+        /// The domain section name
+        /// </summary>
+        public const string DomainSectionName = "Domain";
+        /// <summary>
+        /// The sub domain section name
+        /// </summary>
+        public const string SubDomainSectionName = "SubDomain";
         /// <summary>
         /// The section name in the configuration
         /// </summary>
@@ -48,12 +60,15 @@ namespace DotNetApiEventBus
         /// <param name="configuration"></param>
         public EventBusConfig(IConfiguration configuration) 
         {
-            IConfigurationSection section = configuration.GetSection(ConfigurationSectionName);
+            IConfigurationSection eventBusSection = configuration.GetRequiredSection(EventBusSectionName);
+            IConfigurationSection appSection = configuration.GetRequiredSection(AppSectionName);
 
-            Host = section[ConfigurationSectionHostName] ?? DefaultHost;
-            Username = section[ConfigurationSectionUsernameName] ?? DefaultUsername;
-            Password = section[ConfigurationSectionPasswordName] ?? DefaultPassword;
-            QueueName = section[ConfigurationSectionQueueNameName] ?? DefaultQueueName;
+            Host = eventBusSection[ConfigurationSectionHostName] ?? DefaultHost;
+            Username = eventBusSection[ConfigurationSectionUsernameName] ?? DefaultUsername;
+            Password = eventBusSection[ConfigurationSectionPasswordName] ?? DefaultPassword;
+
+            Domain = appSection[DomainSectionName] ?? throw new InvalidOperationException("The domain is required");
+            SubDomain = appSection[SubDomainSectionName] ?? throw new InvalidOperationException("The sub domain is required");
         }
         /// <summary>
         /// Creates a new event bus configuratino
@@ -61,13 +76,15 @@ namespace DotNetApiEventBus
         /// <param name="host">The host</param>
         /// <param name="username">The username</param>
         /// <param name="password">The password</param>
-        /// <param name="queueName">The queue name</param>
-        public EventBusConfig(string host, string username, string password, string queueName)
+        /// <param name="domain">The domain</param>
+        /// <param name="subDomain">The sub domain</param>
+        public EventBusConfig(string host, string username, string password, string domain, string subDomain)
         {
             Host = host;
             Username = username;
             Password = password;
-            QueueName = queueName;
+            Domain = domain ?? throw new InvalidOperationException("The domain is required");
+            SubDomain = subDomain?? throw new InvalidOperationException("The sub domain is required");
         }
 
         /// <summary>
@@ -83,8 +100,36 @@ namespace DotNetApiEventBus
         /// </summary>
         public string Password { get; private set; } = DefaultPassword;
         /// <summary>
-        /// The event bus queue name
+        /// The domain
         /// </summary>
-        public string QueueName { get; private set; } = DefaultQueueName;
+        public string Domain { get; private set; } = string.Empty;
+        /// <summary>
+        /// The sub domain
+        /// </summary>
+        public string SubDomain { get; private set; } = string.Empty;
+        /// <summary>
+        /// The queue name
+        /// </summary>
+        public string QueueName
+        {
+            get
+            {
+                return $"{Domain}.{SubDomain}";
+            }
+        }
+        /// <summary>
+        /// The port
+        /// </summary>
+        public int Port { get; private set; } = DefaultPort;
+        /// <summary>
+        /// The connection string
+        /// </summary>
+        public string ConnectionString
+        {
+            get
+            {
+                return $"amqp://{Username}:{Password}@{Host}:{Port}";
+            }
+        }
     }
 }

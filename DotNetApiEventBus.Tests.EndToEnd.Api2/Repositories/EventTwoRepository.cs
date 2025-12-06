@@ -1,60 +1,28 @@
-﻿using DotNetApiEventBus.Tests.EndToEnd.Events;
+﻿using DotNetApiEventBus.Tests.EndToEnd.Api2.Services;
+using DotNetApiEventBus.Tests.EndToEnd.Events;
 using DotNetApiLogging;
 
-namespace DotNetApiEventBus.Tests.EndToEnd.Api.Services
+namespace DotNetApiEventBus.Tests.EndToEnd.Api.Repositories
 {
-
-    public interface IEventOneConsumerService
-    {
-        public List<EventOne> Get();
-        public EventOne? Get(Guid id);
-        public string OutputPath { get; }
-        public void Delete();
-        public void Delete(Guid id);
-        void Create(EventOne @event);
-        void Handle(EventOne @event);
-    }
-    public class EventOneConsumerService : IEventOneConsumerService
+    public class EventTwoRepository
     {
         public const string OutputDirectory = "Output";
         private static object _lockObject = new object();
-        private readonly ILogger<IEventOneService> _logger;
-        private readonly FileRepository<EventOne> _fileRepository;
-        public EventOneConsumerService(ILogger<IEventOneService> logger) : base()
+        private readonly ILogger<IEventTwoService> _logger;
+        protected readonly FileRepository<EventTwo> _fileRepository;
+        public EventTwoRepository(ILogger<IEventTwoService> logger, string fileName) : base()
         {
             _logger = logger;
-            _fileRepository = new FileRepository<EventOne>(OutputPath);
+            _fileRepository = new FileRepository<EventTwo>(Path.Combine(OutputDirectory, $"{fileName}.json"));
         }
-        public void Handle(EventOne @event)
-        {
-            lock (_lockObject)
-            {
-                using (_logger.BeginScope("Handling eventOne {@event}", args: [@event]))
-                {
-                    EventOne existingEvent = Get(@event.Id) ?? @event;       
-                    existingEvent.AttemptNumber += 1;
-                    _logger.LogInformationCaller("Attempt number {attemptNumber}", args: [existingEvent.AttemptNumber]);
-                    _logger.LogInformationCaller("Deleting event");
-                    Delete(existingEvent.Id);
-                    _logger.LogInformationCaller("Creating event");
-                    Create(existingEvent);
-                    if (existingEvent.ThrowDuringProcessing &&
-                        existingEvent.AttemptNumber != existingEvent.SucceedOnAttemptNumber)
-                    {
-                        _logger.LogInformationCaller("Throwing exception");
-                        throw new InvalidOperationException();
-                    }
-                }
-            }
-        }
-        public List<EventOne> Get()
+        public List<EventTwo> Get()
         {
             lock (_lockObject)
             {
                 return _fileRepository.Get();
             }
         }
-        public void Create(EventOne @event)
+        public void Create(EventTwo @event)
         {
             lock (_lockObject)
             {
@@ -70,7 +38,7 @@ namespace DotNetApiEventBus.Tests.EndToEnd.Api.Services
                 }
             }
         }
-        public EventOne? Get(Guid id)
+        public EventTwo? Get(Guid id)
         {
             lock (_lockObject)
             {
@@ -89,13 +57,12 @@ namespace DotNetApiEventBus.Tests.EndToEnd.Api.Services
                 }
             }
         }
-        public string OutputPath => Path.Combine(OutputDirectory, $"{nameof(EventOneConsumerService)}.json");
         public void Delete()
         {
             lock (_lockObject)
             {
                 _logger.LogInformationCaller("Deleting all eventOnes");
-                _fileRepository.Save(new List<EventOne>());
+                _fileRepository.Save(new List<EventTwo>());
                 _logger.LogInformationCaller("Deleted all eventOnes");
             }
         }

@@ -10,7 +10,17 @@ namespace DotNetApiEventBus.Tests.EndToEnd
         private List<Process> _apiProcesses = new List<Process>();
         private List<Process> _dockerProcesses = new List<Process>();
 
+        /// <summary>
+        /// Setting that dictates whether the testing framework will start the APIs
+        /// set this to false if you want to manually start the APIs for debugging
+        /// purposes
+        /// </summary>
         public static bool StartApis = true;
+        /// <summary>
+        /// Settings that dictates whether to start the related docker infrastructure
+        /// i.e. the event bus, set this to false if you want to manually start the
+        /// event bus via the lrun.sh command
+        /// </summary>
         public static bool StartDocker = true;
 
         public static int WaitForStartMs = 10000;
@@ -21,7 +31,7 @@ namespace DotNetApiEventBus.Tests.EndToEnd
             {
                 DockerUtilities.StopInstance(EventBusDockerContainerName);
                 DockerUtilities.RemoveInstance(EventBusDockerContainerName);
-                StartProcess("docker", $"run -p 15672:15672 -p 5672:5672 --name {EventBusDockerContainerName} masstransit/rabbitmq", _dockerProcesses);
+                StartProcess("docker", $"run --name {EventBusDockerContainerName} -p 5672:5672 -p 8080:15672 rabbitmq:3-management", _dockerProcesses);
                 System.Threading.Thread.Sleep(WaitForStartMs);
             }
             if (StartApis)

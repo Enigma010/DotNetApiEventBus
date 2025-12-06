@@ -4,5 +4,6 @@
   <Project Path="../DotNetApiEventBus.Tests.EndToEnd.Api2.Client/DotNetApiEventBus.Tests.EndToEnd.Api2.Client.csproj" />
   <Project Path="../DotNetApiEventBus.Tests.EndToEnd.Api2/DotNetApiEventBus.Tests.EndToEnd.Api2.csproj" />
   <Project Path="../DotNetApiEventBus.Tests.EndToEnd.Events/DotNetApiEventBus.Tests.EndToEnd.Events.csproj" />
+  <Project Path="../DotNetApiEventBus/DotNetApiEventBus.csproj" />
   <Project Path="DotNetApiEventBus.Tests.EndToEnd.csproj" />
 </Solution>

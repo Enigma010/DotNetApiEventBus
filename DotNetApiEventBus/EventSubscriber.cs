@@ -1,6 +1,7 @@
-﻿using MassTransit;
+﻿using DotNetApiLogging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Rebus.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -8,13 +9,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using DotNetApiLogging;
 
 namespace DotNetApiEventBus
 {
     public interface IEventConsumer<EventType> where EventType : class
     {
-        Task Consume(EventType @event);
+        Task Respond(EventType @event);
     }
 
     /// <summary>
@@ -22,8 +22,8 @@ namespace DotNetApiEventBus
     /// </summary>
     /// <typeparam name="EventType">The event type or contract for the event</typeparam>
     [ExcludeFromCodeCoverage(Justification = "Core infrastructure, unit tests would at a lower level")]
-    public abstract class EventConsumer<EventType> : 
-        IConsumer<EventType>, 
+    public abstract class EventSubscriber<EventType> :
+        IHandleMessages<EventType>, 
         IEventConsumer<EventType> where EventType : class
     {
         /// <summary>
@@ -34,25 +34,23 @@ namespace DotNetApiEventBus
         /// Createa new event consumer
         /// </summary>
         /// <param name="logger"></param>
-        public EventConsumer(ILogger<EventConsumer<EventType>> logger, IConfiguration configuration)
+        public EventSubscriber(ILogger<EventSubscriber<EventType>> logger, 
+            IConfiguration configuration)
         {
             _logger = logger;
-            ConsumerDefintion = new EventConsumerDefinition<IConsumer<EventType>>(configuration);
         }
         /// <summary>
         /// The mass transit entry point for consuming events
         /// </summary>
         /// <param name="context">The consumer context</param>
         /// <returns></returns>
-        public async Task Consume(ConsumeContext<EventType> context)
+        public async Task Handle(EventType @event)
         {
-            _logger.LogInformationCaller("Processing from queue {QueueName} message {@Message}",
-                args: [ConsumerDefintion.EventBusConfig.QueueName,
-                context.Message]);
-            await Consume(context.Message);
-            _logger.LogInformationCaller("Processed from queue {QueueName} message {@Message}",
-                args: [ConsumerDefintion.EventBusConfig.QueueName,
-                context.Message]);
+            _logger.LogInformationCaller("Processing event {@event}",
+                args: [@event]);
+            await Respond(@event);
+            _logger.LogInformationCaller("Processed event {@event}",
+                args: [@event]);
         }
         /// <summary>
         /// The entry point for consuming events, implement this and
@@ -60,14 +58,6 @@ namespace DotNetApiEventBus
         /// </summary>
         /// <param name="event">The event</param>
         /// <returns></returns>
-        public abstract Task Consume(EventType @event);
-        /// <summary>
-        /// The consumer definition
-        /// </summary>
-        public EventConsumerDefinition<IConsumer<EventType>> ConsumerDefintion
-        {
-            get;
-            private set;
-        }
+        public abstract Task Respond(EventType @event);
     }
 }

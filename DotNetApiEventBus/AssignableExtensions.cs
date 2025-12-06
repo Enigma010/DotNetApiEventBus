@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace DotNetApiEventBus
 {
@@ -24,7 +19,7 @@ namespace DotNetApiEventBus
             return givenType == genericType
               || givenType.MapsToGenericTypeDefinition(genericType)
               || givenType.HasInterfaceThatMapsToGenericTypeDefinition(genericType)
-              || givenType.BaseType.IsAssignableToGenericType(genericType);
+              || givenType!.BaseType!.IsAssignableToGenericType(genericType);
         }
         /// <summary>
         /// Returns if a giveb type has an interface of a specific generic type

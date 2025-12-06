@@ -30,10 +30,10 @@ namespace DotNetApiEventBus.Tests.EndToEnd
         public async Task PublishSingleEvent()
         {
             var events = new List<IEvent> { new Events.EventOne() };
-            await events.CheckEvents(_check, _check, _host);
+            await events.CheckEvents(_check, _host);
         }
 
-        [Fact(Skip = "Retries not working")]
+        [Fact]
         public async Task PublishSingleEventWithTempFailure()
         {
             Events.EventOne eventOne = new Events.EventOne();
@@ -43,14 +43,28 @@ namespace DotNetApiEventBus.Tests.EndToEnd
             {
                 eventOne
             };
-            await events.CheckEvents(_check, _check, _host);
+            await events.CheckEvents(_check, _host);
         }
 
         [Fact]
         public async Task PublishMultipleEvents()
         {
             var events = new List<IEvent> { new Events.EventOne(), new Events.EventOne() };
-            await events.CheckEvents(_check, _check, _host);
+            await events.CheckEvents(_check, _host);
+        }
+
+        [Fact]
+        public async Task PublishSingleEventWithFailure()
+        {
+            Events.EventOne eventOne = new Events.EventOne();
+            eventOne.ThrowDuringProcessing = true;
+            // The max number of retries is 10 by default
+            eventOne.SucceedOnAttemptNumber = 15;
+            List<Events.EventOne> events = new List<Events.EventOne>()
+            {
+                eventOne
+            };
+            await events.CheckFailedEvents(_check, _host);
         }
     }
 }
