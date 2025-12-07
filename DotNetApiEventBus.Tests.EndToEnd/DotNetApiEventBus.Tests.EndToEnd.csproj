@@ -1,14 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
@@ -31,15 +28,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\DotNetApiEventBus.Tests.EndToEnd.Api.Client\DotNetApiEventBus.Tests.EndToEnd.Api.Client.csproj" />
     <ProjectReference Include="..\DotNetApiEventBus.Tests.EndToEnd.Api2.Client\DotNetApiEventBus.Tests.EndToEnd.Api2.Client.csproj" />
     <ProjectReference Include="..\DotNetApiEventBus.Tests.EndToEnd.Events\DotNetApiEventBus.Tests.EndToEnd.Events.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
-
 </Project>

@@ -21,12 +21,12 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore ./DotNetApiEventBus/DotNetApiEventBus.sln
+      run: dotnet restore ./DotNetApiEventBus/DotNetApiEventBus.slnx
     - name: Build
-      run: dotnet build --no-restore ./DotNetApiEventBus/DotNetApiEventBus.sln
+      run: dotnet build --no-restore ./DotNetApiEventBus/DotNetApiEventBus.slnx
     - name: Publish
-      run: dotnet publish ./DotNetApiEventBus/DotNetApiEventBus.sln
+      run: dotnet publish ./DotNetApiEventBus/DotNetApiEventBus.slnx
     - name: Test
-      run: dotnet test --no-build --verbosity normal ./DotNetApiEventBus/DotNetApiEventBus.sln
+      run: dotnet test --no-build --verbosity normal ./DotNetApiEventBus/DotNetApiEventBus.slnx
     - name: Create packages
-      run: dotnet nuget push "DotNetApiEventBus/bin/Release/DotNetApiEventBus.2.0.0.nupkg" --api-key $GITHUBCFG_PAT --source "github" --skip-duplicate
+      run: dotnet nuget push "DotNetApiEventBus/bin/Release/DotNetApiEventBus.3.0.0.nupkg" --api-key $GITHUBCFG_PAT --source "github" --skip-duplicate
