@@ -1,12 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Rebus.Bus;
 using Rebus.Config;
-using Rebus.Persistence.FileSystem;
-using Rebus.RabbitMq;
 using Rebus.Retry.Simple;
-using Rebus.Routing.TypeBased;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
