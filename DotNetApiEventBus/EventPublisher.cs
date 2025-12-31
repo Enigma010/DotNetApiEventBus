@@ -1,5 +1,4 @@
 ﻿using DotNetApiLogging;
-using DotNetApiUnitOfWork;
 using Microsoft.Extensions.Logging;
 using Rebus.Bus;
 using Rebus.Messages;
@@ -9,7 +8,7 @@ using System.Transactions;
 
 namespace DotNetApiEventBus
 {
-    public interface IEventPublisher : IUnitOfWork
+    public interface IEventPublisher
     {
         Task Publish(IEnumerable<object> events);
     }
@@ -54,6 +53,8 @@ namespace DotNetApiEventBus
             if(_transactionScope != null)
             {
                 _transactionScope.Complete();
+                _transactionScope.Dispose();
+                _transactionScope = null;
             }
             return Task.CompletedTask;
         }
