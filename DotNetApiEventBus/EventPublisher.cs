@@ -42,7 +42,7 @@ namespace DotNetApiEventBus
         {
             if (_transactionScope == null)
             {
-                _transactionScope = new TransactionScope();
+                _transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
                 _transactionScope.EnlistRebus();
             }
             return Task.CompletedTask;    
