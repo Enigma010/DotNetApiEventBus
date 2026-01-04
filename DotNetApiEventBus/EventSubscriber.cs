@@ -23,7 +23,7 @@ namespace DotNetApiEventBus
     /// <typeparam name="EventType">The event type or contract for the event</typeparam>
     [ExcludeFromCodeCoverage(Justification = "Core infrastructure, unit tests would at a lower level")]
     public abstract class EventSubscriber<EventType> :
-        IHandleMessages<EventType>, 
+        IHandleMessages<EventType>,
         IEventConsumer<EventType> where EventType : class
     {
         /// <summary>
@@ -34,7 +34,7 @@ namespace DotNetApiEventBus
         /// Createa new event consumer
         /// </summary>
         /// <param name="logger"></param>
-        public EventSubscriber(ILogger<EventSubscriber<EventType>> logger, 
+        public EventSubscriber(ILogger<EventSubscriber<EventType>> logger,
             IConfiguration configuration)
         {
             _logger = logger;

@@ -9,6 +9,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotNetApiEventBus.Tests.EndToEnd.Events\DotNetApiEventBus.Tests.EndToEnd.Events.csproj" />
+    <ProjectReference Include="..\DotNetApiEventBus.Tests.EndToEnd\DotNetApiEventBus.Tests.EndToEnd.csproj" />
     <ProjectReference Include="..\DotNetApiEventBus\DotNetApiEventBus.csproj" />
   </ItemGroup>
 </Project>

@@ -45,12 +45,12 @@ namespace DotNetApiEventBus
                 _transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
                 _transactionScope.EnlistRebus();
             }
-            return Task.CompletedTask;    
+            return Task.CompletedTask;
         }
 
         public Task Commit()
         {
-            if(_transactionScope != null)
+            if (_transactionScope != null)
             {
                 _transactionScope.Complete();
                 _transactionScope.Dispose();
@@ -107,7 +107,7 @@ namespace DotNetApiEventBus
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
-                    if(_transactionScope != null)
+                    if (_transactionScope != null)
                     {
                         _transactionScope.Dispose();
                     }
