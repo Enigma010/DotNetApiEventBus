@@ -4,7 +4,7 @@ Library for interacting with the event bus.  The event bus is used to communicat
 ## Guidelines
 The following describes guidelines for the architecture.
 
-* The event bus is a shared component between all microservices and as such long term should be moved into its own nuget package.
+* The event bus is a shared component between all microservices that are considered part of the same system. If the connecting component is considered as something external to the system they should not try to use the event bus but should instead used webhooks as part of their infrastructure.  Note that webhooks can be triggered be events emitted through the event bus.
 
 ## End to End Testing
 The testing of the event bus is done through end to end testing, that is to say the tests use four main components to test the frame work:

@@ -17,7 +17,7 @@ namespace DotNetApiEventBus
             {
                 if (type.IsEventSubscriberType())
                 {
-                    yield return new (type, type!.BaseType!.GetGenericArguments().First());
+                    yield return new(type, type!.BaseType!.GetGenericArguments().First());
                 }
             }
         }

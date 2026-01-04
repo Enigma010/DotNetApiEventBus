@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Rebus.Config;
 using Rebus.Retry.Simple;
@@ -15,29 +16,30 @@ namespace DotNetApiEventBus.Di
     public static class DependencyInjector
     {
         /// <summary>
-        /// The delimiter used to separate the queue name parts
-        /// </summary>
-        public const string QueueNameDelimiter = ":";
-        /// <summary>
         /// Registers dependencies for the application
         /// </summary>
         /// <param name="builder">The application host builder</param>
         public static void AddEventBusDependencies(
-            this IHostApplicationBuilder builder, 
+            this IHostApplicationBuilder builder,
             IEnumerable<string> subscriberAssemblyNames)
         {
-            EventBusConfig eventBusConfig = new EventBusConfig(builder.Configuration);
+            builder.Configuration.AddEnvironmentVariables();
+
+            DddConfig dddConfig = new DddConfig(builder.Configuration);
+            EventBusConfig eventBusConfig = new EventBusConfig(builder.Configuration, dddConfig);
             List<Assembly> subscriberAssemblies = new List<Assembly>();
             List<Assembly> publisherAssemblies = new List<Assembly>();
+
             subscriberAssemblyNames.ToList().ForEach(subscriberAssemblyName =>
             {
                 subscriberAssemblies.Add(Assembly.Load(subscriberAssemblyName));
             });
 
             builder.Services.AddRebus(
-                (configure, provider) => {
+                (configure, provider) =>
+                {
                     return configure
-                    .Transport(t =>t.UseRabbitMq(eventBusConfig.ConnectionString, 
+                    .Transport(t => t.UseRabbitMq(eventBusConfig.ConnectionString,
                     eventBusConfig.QueueName))
                     .Options(o => o.HandleMessagesInsideTransactionScope())
                     .Options(b => b.RetryStrategy(maxDeliveryAttempts: 10));

@@ -5,7 +5,6 @@ namespace DotNetApiEventBus.Tests.EndToEnd
     
     public class EndToEndFixture : IDisposable
     {
-        public const string EventBusDockerContainerName = "EventBusEndToEndTests";
 
         private List<Process> _apiProcesses = new List<Process>();
         private List<Process> _dockerProcesses = new List<Process>();
@@ -29,9 +28,9 @@ namespace DotNetApiEventBus.Tests.EndToEnd
         {
             if (StartDocker)
             {
-                DockerUtilities.StopInstance(EventBusDockerContainerName);
-                DockerUtilities.RemoveInstance(EventBusDockerContainerName);
-                StartProcess("docker", $"run --name {EventBusDockerContainerName} -p 5672:5672 -p 8080:15672 rabbitmq:3-management", _dockerProcesses);
+                DockerUtilities.StopInstance(TestsConfig.ContainerName);
+                DockerUtilities.RemoveInstance(TestsConfig.ContainerName);
+                StartProcess("docker", $"run --name {TestsConfig.ContainerName} -p {TestsConfig.DefaultPort}:5672 -p 8080:15672 rabbitmq:3-management", _dockerProcesses);
                 System.Threading.Thread.Sleep(WaitForStartMs);
             }
             if (StartApis)
@@ -46,8 +45,8 @@ namespace DotNetApiEventBus.Tests.EndToEnd
         {
             if (StartDocker)
             {
-                DockerUtilities.StopInstance(EventBusDockerContainerName);
-                DockerUtilities.RemoveInstance(EventBusDockerContainerName);
+                DockerUtilities.StopInstance(TestsConfig.ContainerName);
+                DockerUtilities.RemoveInstance(TestsConfig.ContainerName);
                 StopProcesses(_dockerProcesses);
             }
             if (StartApis)

@@ -29,4 +29,4 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal ./DotNetApiEventBus/DotNetApiEventBus.slnx
     - name: Create packages
-      run: dotnet nuget push "DotNetApiEventBus/bin/Release/DotNetApiEventBus.3.0.4.nupkg" --api-key $GITHUBCFG_PAT --source "github" --skip-duplicate
+      run: dotnet nuget push "DotNetApiEventBus/bin/Release/DotNetApiEventBus.3.0.5.nupkg" --api-key $GITHUBCFG_PAT --source "github" --skip-duplicate
